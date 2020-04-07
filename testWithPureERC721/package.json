@@ -1,0 +1,25 @@
+{
+  "name": "uniswapV2RouterGaselessTest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "DaiAbi.js",
+  "dependencies": {
+    "@biconomy/mexa": "^1.5.3",
+    "browserify": "^16.5.0",
+    "light-server": "^2.6.4",
+    "lite-server": "^2.5.4",
+    "web3": "^1.2.6"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^10.0.0"
+  },
+  "scripts": {
+    "build:js": "browserify ./src/callMethodOfGaslessRouter.js > bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "light-server -s . -p 9090 -w \"./src/**/*.js, ./*.html # npm run build:js\""
+  },
+  "author": "",
+  "license": "ISC"
+}
