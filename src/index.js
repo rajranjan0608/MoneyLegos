@@ -150,6 +150,37 @@ var jsonInterFaceOfgetAmountsOut = {
     }
   ]
 };
+var jsonInterFaceOfSwapExactTokensForTokens = {
+  name: "swapExactTokensForTokens",
+  type: "function",
+  inputs: [
+    {
+      internalType: "uint256",
+      name: "amountIn",
+      type: "uint256"
+    },
+    {
+      internalType: "uint256",
+      name: "amountOutMin",
+      type: "uint256"
+    },
+    {
+      internalType: "address[]",
+      name: "path",
+      type: "address[]"
+    },
+    {
+      internalType: "address",
+      name: "to",
+      type: "address"
+    },
+    {
+      internalType: "uint256",
+      name: "deadline",
+      type: "uint256"
+    }
+  ]
+};
 const justTrying = async () => {
   var contractAbi = gaslessRouterAbi;
   const contract = new web3.eth.Contract(contractAbi, contractAddress);
@@ -299,28 +330,284 @@ const init = async () => {
   });
 };
 
-if (window.ethereum) {
-  //  window.web3 = new Web3(window.ethereum);
-  window.ethereum.enable().then(res => console.log(res));
-}
-const biconomy = new Biconomy(window.ethereum, {
-  dappId: "5e817cc88d62414c7a8755e0",
-  apiKey: "MLQRERuDS.ef47dced-a37e-4959-ab6d-c698096febb9"
-});
-var web3 = new Web3(biconomy);
-biconomy
-  .onEvent(biconomy.READY, async () => {
-    console.log("hello");
-    justTrying();
-  })
-  .onEvent(biconomy.ERROR, (error, message) => {
-    console.log("message:      " + message);
-  });
+var web3;
+var biconomy;
+var daiContract;
 
-web3.eth.net
-  .isListening()
-  .then(() => console.log("web3 is connected"))
-  .catch(e => console.log("Wow. Something went wrong"));
+var moduleTry = {
+  connectWallet: async function() {
+    if (window.ethereum) {
+      //  window.web3 = new Web3(window.ethereum);
+      window.ethereum.enable().then(res => console.log(res));
+    }
+    biconomy = new Biconomy(window.ethereum, {
+      dappId: "5e817cc88d62414c7a8755e0",
+      apiKey: "MLQRERuDS.ef47dced-a37e-4959-ab6d-c698096febb9",
+      debug: "true"
+    });
+    web3 = new Web3(biconomy);
+    biconomy
+      .onEvent(biconomy.READY, async () => {
+        console.log("hello");
+        //justTrying();
+      })
+      .onEvent(biconomy.ERROR, (error, message) => {
+        console.log(error);
+      });
+  },
+  unlockDai: async function() {
+    function getDomainData(
+      contractName,
+      signatureVersion,
+      chainId,
+      contractAddress
+    ) {
+      return {
+        name: contractName,
+        version: signatureVersion,
+        chainId: chainId,
+        verifyingContract: contractAddress
+      };
+    }
+    const domains = {};
+    domains.getDaiDomainData = function(contractAddres, chainId) {
+      return getDomainData(
+        "Dai Semi-Automated Permit Office",
+        "0.1",
+        chainId,
+        contractAddres
+      );
+    };
+    //console.log(domains.getDomainData("0x214sdflj"));
+    const schemas = {};
+
+    //The schema of every contract that supports EIP712Domain
+
+    schemas.domain = [
+      { name: "name", type: "string" },
+      { name: "version", type: "string" },
+      { name: "chainId", type: "uint256" },
+      { name: "verifyingContract", type: "address" }
+    ];
+    schemas.permit = [
+      { name: "holder", type: "address" },
+      { name: "spender", type: "address" },
+      { name: "nonce", type: "uint256" },
+      { name: "expiry", type: "uint256" },
+      { name: "allowed", type: "bool" }
+    ];
+    const generators = {};
+
+    function getRequestData(
+      domainDataFn,
+      contractAddress,
+      chainId,
+      messageTypeName,
+      messageSchema,
+      message
+    ) {
+      const domainData = domainDataFn(contractAddress, chainId);
+      // console.log("domainData:"+ JSON.stringify(domainData));
+      // console.log("DOMAIN_SEPARATOR: " + web3.utils.sha3(JSON.stringify(domainData)));
+      const types = {
+        EIP712Domain: schemas.domain
+      };
+      types[messageTypeName] = messageSchema;
+      return {
+        types: types,
+        domain: domainData,
+        primaryType: messageTypeName,
+        message: message
+      };
+    }
+
+    generators.getPermit = function(
+      contractAddres,
+      chainId,
+      holder,
+      spender,
+      nonce,
+      expiry,
+      allowed
+    ) {
+      const message = {
+        holder: holder,
+        spender: spender,
+        nonce: nonce,
+        expiry: expiry,
+        allowed: allowed
+      };
+      return getRequestData(
+        domains.getDaiDomainData,
+        contractAddres,
+        chainId,
+        "Permit",
+        schemas.permit,
+        message
+      );
+    };
+    //console.log(generators.getPermit("0xcontractAddres","chainId","0xHolder","0xSpender","nonce","expiry","allowed"))
+    var contractAddress = "0x59DdAdcE870827186fC0aB55d8BFA9C601c3C4C0";
+    var contractAbi = daiAbi;
+    //console.log(daiAbi);
+
+    const contract = new web3.eth.Contract(daiAbi, contractAddress);
+    daiContract = contract;
+    const accounts = await web3.eth.getAccounts();
+
+    var holder = ethereum.selectedAddress;
+    var spender = "0xfDF3579A72F371aa22687DAF4566F48ddc159F80"; //The gasless router contract
+    var nonce;
+    var expiry;
+    var allowed = "true";
+    var latestBlock = await web3.eth.getBlock("latest");
+    var nonce = await contract.methods.nonces(holder).call();
+
+    const minute = 3600;
+    expiry = latestBlock.timestamp + minute;
+    console.log("expiry: " + expiry);
+    console.log("nonce: " + nonce);
+    var chainId = await web3.eth.net.getId();
+
+    let signatureData = generators.getPermit(
+      contractAddress,
+      chainId,
+      holder,
+      spender,
+      nonce,
+      expiry,
+      allowed
+    );
+    console.log(signatureData);
+    let sigString = JSON.stringify(signatureData);
+
+    signer = accounts[0];
+    //console.log(signatureData.primaryType)
+    //web3.eth.personal.unlockAccount(accounts[0], "password", function (err, result) {console.log(result)})
+    web3.providers.HttpProvider.prototype.sendAsync =
+      web3.providers.HttpProvider.prototype.send;
+    web3.currentProvider.sendAsync(
+      {
+        method: "eth_signTypedData_v4",
+        params: [signer, sigString],
+        from: signer
+      },
+      function(err, result) {
+        if (err) {
+          return console.error(err);
+        }
+        console.log(result);
+        const signature = result.result.substring(2);
+        const r = "0x" + signature.substring(0, 64);
+        const s = "0x" + signature.substring(64, 128);
+        const v = parseInt(signature.substring(128, 130), 16);
+        // The signature is now comprised of r, s, and v.
+        contract.methods
+          .permit(holder, spender, nonce, expiry, allowed, v, r, s)
+          .send({ from: accounts[0] })
+          .then(console.log);
+      }
+    );
+  },
+  getExchangeRate: async function() {
+    var inputToken = document.getElementById("inputToken").value;
+    var amountIn = document.getElementById("input").value;
+    var outputToken = document.getElementById("outputToken").value;
+    var daiAddress = "0x59DdAdcE870827186fC0aB55d8BFA9C601c3C4C0";
+    var WETHAddress = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
+    var inputTokenAddress;
+    var outputTokenAddress;
+    if (inputToken === "dai") inputTokenAddress = daiAddress;
+    if (outputToken === "WETH") outputTokenAddress = WETHAddress;
+
+    var contractAbi = gaslessRouterAbi;
+    var contractAddress = "0xfDF3579A72F371aa22687DAF4566F48ddc159F80";
+    const contract = new web3.eth.Contract(contractAbi, contractAddress);
+    var outputAmounts = await contract.methods
+      .getAmountsOut(amountIn, [inputTokenAddress, outputTokenAddress])
+      .call();
+    var outputAmount = outputAmounts[1];
+    console.log(outputAmount);
+    console.log(outputAmounts);
+
+    document.getElementById("output").value = outputAmount;
+  },
+  swap: async function() {
+    var inputToken = document.getElementById("inputToken").value;
+    var amountIn = document.getElementById("input").value;
+    var outputToken = document.getElementById("outputToken").value;
+    var daiAddress = "0x59DdAdcE870827186fC0aB55d8BFA9C601c3C4C0";
+    var WETHAddress = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
+    var inputTokenAddress;
+    var outputTokenAddress;
+    if (inputToken === "dai") inputTokenAddress = daiAddress;
+    if (outputToken === "WETH") outputTokenAddress = WETHAddress;
+    var contractAbi = gaslessRouterAbi;
+    var contractAddress = "0xfDF3579A72F371aa22687DAF4566F48ddc159F80";
+    const contract = new web3.eth.Contract(contractAbi, contractAddress);
+
+    var amountOutMin = 1;
+    var path = [inputTokenAddress, outputTokenAddress];
+    var to = ethereum.selectedAddress;
+    var expiry = 12345678911110; //large number
+    var swapExactTokensForTokensFunctionSignature = web3.eth.abi.encodeFunctionCall(
+      jsonInterFaceOfSwapExactTokensForTokens,
+      [amountIn, amountOutMin, path, to, expiry]
+    );
+    let accounts = await web3.eth.getAccounts();
+    let signer = accounts[0];
+    let chainId = await web3.eth.net.getId();
+    let nonce = await contract.methods.getNonce(signer).call();
+
+    let signatureData = generators.getMetaTransaction(
+      contractAddress,
+      chainId,
+      nonce,
+      signer,
+      swapExactTokensForTokensFunctionSignature
+    );
+    let sigString = JSON.stringify(signatureData);
+
+    web3.providers.HttpProvider.prototype.sendAsync =
+      web3.providers.HttpProvider.prototype.send;
+    web3.currentProvider.sendAsync(
+      {
+        method: "eth_signTypedData_v4",
+        params: [signer, sigString],
+        from: signer
+      },
+      function(err, result) {
+        if (err) {
+          return console.error(err);
+        }
+        console.log(result);
+        const signature = result.result.substring(2);
+        const sigR = "0x" + signature.substring(0, 64);
+        const sigS = "0x" + signature.substring(64, 128);
+        const sigV = parseInt(signature.substring(128, 130), 16);
+
+        contract.methods
+          .executeMetaTransaction(
+            signer,
+            swapExactTokensForTokensFunctionSignature,
+            sigR,
+            sigS,
+            sigV
+          )
+          .send({ from: signer }, (err, res) => {
+            if (err) console.log(err);
+            else console.log(res);
+          });
+      }
+    );
+  }
+};
+module.exports = moduleTry;
+
+// web3.eth.net
+//   .isListening()
+//   .then(() => console.log("web3 is connected"))
+//   .catch(e => console.log("Wow. Something went wrong"));
 
 // var contractAddress = "0xfDF3579A72F371aa22687DAF4566F48ddc159F80";
 //
