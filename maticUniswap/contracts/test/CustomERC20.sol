@@ -22,8 +22,8 @@ contract CustomERC20 is IERC20 {
     event Transfer(address indexed from, address indexed to, uint value);
 
     constructor(string memory _name,string memory _symbol,uint _totalSupply,uint _chainId) public {
-      _name = name;
-      _symbol = symbol;
+      name = _name;
+      symbol = _symbol;
       _mint(msg.sender, _totalSupply);
 
         uint chainId = _chainId;
