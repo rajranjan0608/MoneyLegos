@@ -5,8 +5,6 @@ import Navbar from "./components/js/navabar.component";
 import Dashboard from "./components/js/dashboard.component"
 
 import Web3 from 'web3'
-import TruffleContract from 'truffle-contract'
-// import MainContract from './build/contracts/MainContract.json'
 
 class App extends React.Component {
 
@@ -16,50 +14,32 @@ class App extends React.Component {
             account: '0x0',
 	        electionCount: 0
         }
-        // this.loadWeb3();
+        this.loadWeb3();
     }
 
-    // //Returns Web3 instance
-    // async loadWeb3() {
-    //     let web3 = window.web3;  
+    //Returns Web3 instance
+    async loadWeb3() {
+        let web3 = window.web3;  
       
-    //     //set web3 & truffle contract
-    //     if (typeof web3 !== 'undefined') {
+        //set web3 & truffle contract
+        if (typeof web3 !== 'undefined') {
         
-    //         //Setup Web3 Provider
-    //         this.web3Provider = web3.currentProvider;  
-    //         this.web3 = new Web3(web3.currentProvider);  
-            
-    //         //Setup Contract
-    //         this.MainContract = TruffleContract(MainContract);  
-    //         this.MainContract.setProvider(this.web3Provider);
-            
-    //         //Setup account
-    //         var accounts = await this.web3.eth.getAccounts();
-    //         this.setState({account: accounts[0]});
+            //Setup Web3 Provider
+            this.web3Provider = web3.currentProvider;  
+            this.web3 = new Web3(web3.currentProvider);
 
-    //         return this.web3;
+            return this.web3;
 
-    //     }else{  
-    //         this.isWeb3 = false;  
-    //     }
-    // }
-
-    // //Returns Contract Instance
-    // async loadInstance() {
-    //     //Setup Contract Instance
-    //     this.mainInstance = await this.MainContract.deployed();
-    //     return this.mainInstance;
-    // }
+        }else{
+            return false;
+        }
+    }
 
     render() {
         return (
             <Router>
                 <Navbar account = {this.state.account}/><br/>
-                { <Route path="/dashboard" exact component={Dashboard} />}
-                
-                {/* {<Route path="/createElection" exact component={() => <CreateElection account={this.state.account}/>}/>}
-                {<Route path="/active" exact component={() => <Active account={this.state.account}/>}/>} */}
+                { <Route path="/swap" exact component={Dashboard} />}
             </Router>
         );
     }
