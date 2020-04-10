@@ -5,7 +5,7 @@ import './UniswapV2Library.sol';
 import './interfaces/IWETH.sol';
 import './EIP712MetaTransaction.sol';
 
-contract UniswapV2Router01Gasless is IUniswapV2Router01, UniswapV2Library,EIP712MetaTransaction("UniswapV2Router01Gasless","1") {
+contract UniswapV2Router01Gasless is IUniswapV2Router01, UniswapV2Library,EIP712MetaTransaction {
     bytes4 private constant SELECTOR_TRANSFER = bytes4(keccak256(bytes('transfer(address,uint256)')));
     bytes4 private constant SELECTOR_TRANSFER_FROM = bytes4(keccak256(bytes('transferFrom(address,address,uint256)')));
 
@@ -30,7 +30,7 @@ contract UniswapV2Router01Gasless is IUniswapV2Router01, UniswapV2Library,EIP712
         _;
     }
 
-    constructor(address _WETH,address _factoryAddress) UniswapV2Library(_factoryAddress) public {
+    constructor(address _WETH,address _factoryAddress,uint _chainId) UniswapV2Library(_factoryAddress) EIP712MetaTransaction("UniswapV2Router01Gasless","1",_chainId)public {
         WETH = IWETH(_WETH);
     }
 

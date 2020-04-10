@@ -1,4 +1,6 @@
 const UniswapV2Factory = artifacts.require("UniswapV2Factory");
+// const ERC20 = artifacts.require("ERC20");
+
 // const mDAI = artifacts.require("MDAI");
 // const mETH = artifacts.require("METH");
 // const m0x = artifacts.require("M0x");
@@ -11,6 +13,8 @@ module.exports = function(deployer, network, accounts) {
     setter = accounts[0];
     //deploy the facotry
     let factoryContract = await deployer.deploy(UniswapV2Factory, setter);
+    var initialSupply = 1000000000;
+    // let ERC20Contarct = await deployer.deploy(ERC20, initialSupply);
 
     //mDAI
     // var initialSupply = 1000000000;

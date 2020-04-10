@@ -4,7 +4,7 @@ import './CustomERC20.sol';
 
 contract METH is CustomERC20 {
 
-    constructor(uint _initialSupply) CustomERC20("mETH","mETH",_initialSupply) public {
+    constructor(uint _initialSupply,uint _chainId) CustomERC20("mETH","mETH",_initialSupply,_chainId) public {
 
     }
 }

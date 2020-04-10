@@ -21,15 +21,16 @@ contract CustomERC20 is IERC20 {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
 
-    constructor(string memory _name,string memory _symbol,uint _totalSupply) public {
+    constructor(string memory _name,string memory _symbol,uint _totalSupply,uint _chainId) public {
       _name = name;
       _symbol = symbol;
       _mint(msg.sender, _totalSupply);
 
-        uint chainId;
-        assembly {
-            chainId := chainid
-        }
+        uint chainId = _chainId;
+
+        // assembly {
+        //     chainId := chainid
+        // }
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
