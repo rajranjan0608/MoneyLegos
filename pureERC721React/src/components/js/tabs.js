@@ -19,7 +19,7 @@ export default class Tab extends Component {
 
   render() {
     return (
-        <div className = "card shadow-lg p-3 mb-5 bg-white rounded" style = {{margin: 10, width: 580}}>
+        <div className = "card shadow-lg p-3 mb-5 bg-white rounded" style = {{margin: 10, width: 470}}>
             <Tabs
             style = {styles}
             activeTab={{
