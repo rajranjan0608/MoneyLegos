@@ -38,7 +38,7 @@ class Navbar extends Component {
                             <Link to="/pool" className="nav-link">Pool</Link>
                         </li> */}
                         <li className="navbar-item">
-                            <Link to="/swap" className="nav-link">NFT Marketplace</Link>
+                            <Link to="/nftExchange" className="nav-link">NFT Marketplace</Link>
                         </li>
                     </ul>
 

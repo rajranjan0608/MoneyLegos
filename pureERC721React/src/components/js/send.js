@@ -28,10 +28,10 @@ export default function Send() {
                 </div>
 
                 <br />
-                <input className = "form-control" style = {{width: 400}} placeholder = "Recepient's address 0x0"/>
+                <input className = "form-control shadow rounded" style = {{width: 400}} placeholder = "Recepient's address 0x0"/>
                 <br />
                 <center>
-                    <button className = "btn btn-primary">Send</button>
+                    <button className = "btn btn-primary shadow rounded">Send</button>
                 </center>
                 <br />
             </div>

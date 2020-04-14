@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./components/js/navabar.component";
 import Dashboard from "./components/js/dashboard.component"
+import NFTExchange from "./components/js/nftExchange"
 
 import Web3 from 'web3'
 
@@ -40,6 +41,7 @@ class App extends React.Component {
             <Router>
                 <Navbar account = {this.state.account}/><br/>
                 { <Route path="/swap" exact component={Dashboard} />}
+                { <Route path="/nftExchange" exact component={NFTExchange} />}
             </Router>
         );
     }

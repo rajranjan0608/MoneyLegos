@@ -3,11 +3,19 @@ import React from "react";
 
 import '../css/dashboard.component.css';
 import Input from './InputComponent/index.js';
+import {swap, getPermit} from './contracts/index';
+import ABI from './contracts/config';
 
 import repeat from '../assets/icons/repeat.svg'
 
 
 export default function Swap(props) {
+
+    const swp = async () => {
+        await getPermit(ABI.config.address.mETH, 1); 
+        await swap(props.account, 1, ABI.config.address.mETH, ABI.config.address.mDAI, ABI.config.address.routerAddress)
+    }
+
     return (
 
         <div className = "" style = {{ top: 20, left: 10, position: "relative"}}>
@@ -28,11 +36,11 @@ export default function Swap(props) {
                 </div>
 
                 <br />
-                <input className = "form-control" style = {{width: 400}} disabled placeholder = {"Your address "+props.account}/>
+                <input className = "form-control shadow rounded" style = {{width: 400}} disabled placeholder = {"Your address "+props.account}/>
                 <br />
                 
                 <center>
-                    <button className = "btn btn-primary">Swap</button>
+                    <button className = "btn btn-primary shadow rounded" onClick = {() => {swp()}}>Swap</button>
                 </center>
                 <br />
             </centers>

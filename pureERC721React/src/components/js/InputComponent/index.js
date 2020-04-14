@@ -4,7 +4,7 @@ import crossIcon from './cross.png';
 import './style.css';
 
 // eslint-disable-next-line no-unused-vars
-const dummyArray = ['Bitcoin','Litecoin','Ethereum','Digi','Augur','Blox','Dent'];
+const dummyArray = ['mDAI', 'mETH', 'm0x', 'MANA', 'mBTC', 'mUSDT'];
 
 class Input extends React.Component {
 
