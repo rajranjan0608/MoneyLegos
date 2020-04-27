@@ -9,21 +9,50 @@ import ABI from './contracts/config';
 import repeat from '../assets/icons/repeat.svg'
 
 
-export default function Swap(props) {
+export default class Swap extends React.Component {
 
-    const swp = async () => {
-        await getPermit(ABI.config.address.mETH, 1); 
-        await swap(props.account, 1, ABI.config.address.mETH, ABI.config.address.mDAI, ABI.config.address.routerAddress)
+    constructor(props) {
+        super(props);
+        this.handleAmount = this.handleAmount.bind(this);
+        this.handleInputToken = this.handleInputToken.bind(this);
+        this.handleOutputToken = this.handleOutputToken.bind(this);
+        this.state = {
+            amount: '',
+            inputToken: '',
+            outputToken: ''
+        }
     }
 
-    return (
+    handleAmount(e) {
+        this.setState({amount:e.target.value})
+    }
 
+    handleInputToken(selectedCategory) {
+        this.setState({inputToken:selectedCategory})
+    }
+
+    handleOutputToken(selectedCategory) {
+        this.setState({outputToken:selectedCategory})
+    }
+
+    print() {
+        console.log(this.state);
+    }
+
+    swp = async (inputToken, outputToken, amount) => {
+        await getPermit(inputToken, amount); 
+        await swap(this.props.account, amount, ABI.config.address[inputToken], ABI.config.address[outputToken], ABI.config.address.routerAddress)
+    }
+
+    render () {
+
+        return(
         <div className = "" style = {{ top: 20, left: 10, position: "relative"}}>
             
             <centers style = {{margin: 10}}>
                 <div className = "">
                     <div>
-                        <Input typeOfInput = "You Send"/> 
+                        <Input amount = {this.handleAmount} token = {this.handleInputToken} typeOfInput = "You Send"/> 
                     </div>
 
                     {/* <div className = "grid-item" style = {{marginTop: 10}}>
@@ -31,21 +60,22 @@ export default function Swap(props) {
                     </div> */}<br />
 
                     <div>
-                        <Input typeOfInput = "You Get"/> 
+                        <Input token = {this.handleOutputToken} typeOfInput = "You Get"/> 
                     </div>
                 </div>
 
                 <br />
-                <input className = "form-control shadow rounded" style = {{width: 400}} disabled placeholder = {"Your address "+props.account}/>
+                <input className = "form-control shadow rounded" style = {{width: 400}} disabled placeholder = {"Your address " + this.props.account}/>
                 <br />
                 
                 <center>
-                    <button className = "btn btn-primary shadow rounded" onClick = {() => {swp()}}>Swap</button>
+                    <button className = "btn btn-primary shadow rounded" onClick = {() => {this.swp(this.state.inputToken, this.state.outputToken, this.state.amount)}}>Swap</button>
                 </center>
                 <br />
             </centers>
 
         </div>
+        )
     
-    )
+    }
 } 

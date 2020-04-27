@@ -53,21 +53,21 @@ const connectWallet = async function() {
     domainData.chainId = _chainId;
     domainDataERC20.chainId = _chainId;
     console.log(_chainId);
-    //web3 = new Web3(provider);
-    biconomy = new Biconomy(window.ethereum, {
-      dappId: "5e9485402cb02156d3b4d062",
-      apiKey: "JH7jS-1sf.58ea244a-2f5c-489b-b739-0bfe762712d3",
-      debug: "true"
-    });
-    web3 = new Web3(biconomy);
-    biconomy
-      .onEvent(biconomy.READY, async () => {
-        console.log("hello");
-        //await justTrying();
-      })
-      .onEvent(biconomy.ERROR, (error, message) => {
-        console.log(error);
-      });
+    web3 = new Web3(provider);
+    // biconomy = new Biconomy(window.ethereum, {
+    //   dappId: "5e9485402cb02156d3b4d062",
+    //   apiKey: "JH7jS-1sf.58ea244a-2f5c-489b-b739-0bfe762712d3",
+    //   debug: "true"
+    // });
+    // web3 = new Web3(biconomy);
+    // biconomy
+    //   .onEvent(biconomy.READY, async () => {
+    //     console.log("hello");
+    //     //await justTrying();
+    //   })
+    //   .onEvent(biconomy.ERROR, (error, message) => {
+    //     console.log(error);
+    //   });
 
     contract = new web3.eth.Contract(
       config.contract.routerAbi,
@@ -77,7 +77,7 @@ const connectWallet = async function() {
     console.log(await contract.methods.WETH().call());
   }
 };
-const getSignatureParameters = async function(signature) {
+const getSignatureParameters = signature => {
   if (!web3.utils.isHexStrict(signature)) {
     throw new Error(
       'Given value "'.concat(signature, '" is not a valid hex string.')
@@ -169,7 +169,7 @@ const getNow = async function() {
   return parseInt(now);
 };
 
-const swap = async function(from, amount, inputToken, outputToken, to) {
+export const swap = async function(from, amount, inputToken, outputToken, to) {
   let userAddress = window.ethereum.selectedAddress;
   var now = await getNow();
   var deadline = now + 60 * 60;
@@ -203,14 +203,13 @@ const swap = async function(from, amount, inputToken, outputToken, to) {
       method: "eth_signTypedData_v4",
       params: [userAddress, sigString]
     },
-    async function(error, response) {
-      console.log("Response: "+JSON.stringify(response));
+    function(error, response) {
+      console.log(response);
       console.log(userAddress);
       console.log(JSON.stringify(message));
-      console.log("Message: "+message);
-      console.log("Response result: "+response.result)
-    //   console.log(getSignatureParameters(response.result));
-      let { r, s, v } = await getSignatureParameters(response.result);
+      console.log(message);
+      console.log(getSignatureParameters(response.result));
+      let { r, s, v } = getSignatureParameters(response.result);
       const recovered = sigUtil.recoverTypedSignature_v4({
         data: JSON.parse(sigString),
         sig: response.result
@@ -231,10 +230,10 @@ const swap = async function(from, amount, inputToken, outputToken, to) {
   );
 };
 
-const getPermit = async function(token, value) {
+export const getPermit = async function(token, value) {
   erc20Contract = new web3.eth.Contract(
     config.contract.erc20Abi,
-    token
+    config.address[token]
   );
   console.log(config.address[token]);
   console.log(erc20Contract);
@@ -253,7 +252,7 @@ const getPermit = async function(token, value) {
   message.deadline = deadline;
 
   domainDataERC20.name = token;
-  domainDataERC20.verifyingContract = token;
+  domainDataERC20.verifyingContract = config.address[token];
 
   const dataToSign = {
     types: {
@@ -274,9 +273,9 @@ const getPermit = async function(token, value) {
       method: "eth_signTypedData_v4",
       params: [userAddress, sigString]
     },
-    async function(error, response) {
+    function(error, response) {
       console.log(response);
-      let { r, s, v } =  await getSignatureParameters(response.result);
+      let { r, s, v } = getSignatureParameters(response.result);
       sendPermitTransaction(owner, spender, value, deadline, v, r, s);
     }
   );
@@ -299,23 +298,41 @@ const getAmountOut = async function(
     alert("connectWallet first");
   }
 };
+function getAmountWithDecimals(_tokenAmount) {
+  var decimals = web3.utils.toBN(18);
+  var tokenAmount = web3.utils.toBN(_tokenAmount);
+  var tokenAmountHex = tokenAmount.mul(web3.utils.toBN(10).pow(decimals));
+
+  return web3.utils.toHex(tokenAmountHex);
+}
 // const addLiquidity(token1Name,token2Name,)
+const mint = async function(token) {
+  erc20Contract = new web3.eth.Contract(
+    config.contract.erc20Abi,
+    config.address[token]
+  );
+  let amountToMint = getAmountWithDecimals(1000);
+  console.log(amountToMint);
+  await erc20Contract.methods
+    .mint(amountToMint)
+    .send({ from: window.ethereum.selectedAddress });
+};
 const init = async function() {
   await connectWallet();
-  //await getPermit("mDAI", 1000000000000);
-  let amountOut = await getAmountOut(100, "mBTC", "MANA");
-  console.log(amountOut);
+  
+  // await mint("mDAI");
+  // let amountOut = await getAmountOut(100, "mBTC", "MANA");
+  // console.log(amountOut);
+  //  await getPermit("mDAI", 1000000000000);
   //
   // //
   // await swap(
-  //   ethereum.selectedAddress,
+  //   window.ethereum.selectedAddress,
   //   200,
-  //   config.address["MANA"],
+  //   config.address["mDAI"],
   //   config.address["mBTC"],
   //   "0x5f74c8b427ffa7464B7A0dAa15bbEcA28853a812"
   // );
 };
 //init();
 init();
-
-module.exports = {swap, getPermit};

@@ -17,6 +17,11 @@ config.contract = {
           internalType: "uint256",
           name: "_initialSupply",
           type: "uint256"
+        },
+        {
+          internalType: "uint256",
+          name: "_chainId",
+          type: "uint256"
         }
       ],
       payable: false,
@@ -355,6 +360,21 @@ config.contract = {
           type: "bool"
         }
       ],
+      payable: false,
+      stateMutability: "nonpayable",
+      type: "function"
+    },
+    {
+      constant: false,
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256"
+        }
+      ],
+      name: "mint",
+      outputs: [],
       payable: false,
       stateMutability: "nonpayable",
       type: "function"
