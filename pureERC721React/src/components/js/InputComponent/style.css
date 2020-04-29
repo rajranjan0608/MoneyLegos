@@ -1,0 +1,107 @@
+.container{
+    width: 400px;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+  }
+.input-container{
+width: inherit;
+display: flex;
+border: 2px solid white;
+max-height: 50px;
+}
+.input-container .input-box{
+width: 50%;
+border-top-left-radius: 5px;
+border-bottom-left-radius: 5px;
+}
+.input-container .input-box .input{
+border: none;
+font-size:1rem;
+font-weight:500;
+background-color: white;
+border-top-left-radius: 5px;
+border-bottom-left-radius: 5px;
+padding: 10px;
+}
+.input-container .input-button{
+display: flex;
+width: 50%;
+background-color: rgb(191, 219, 242);
+border-top-right-radius: 5px;
+border-bottom-right-radius: 5px;
+}
+.input-container .input-button .input-button-text{
+width: 85%;
+padding: 10px 5px 10px 10px;
+font-size: 0.8rem;
+}
+.input-container .input-button .input-button-img{
+width: 15%;
+padding: 10px 0px 10px 0px;
+
+}
+.dropdown-container{
+width: inherit;
+border-radius: 5px;
+z-index: 2;
+}
+.dropdown-input{
+background-color: white;
+width: inherit;
+display: flex;
+border-top-left-radius: 5px;
+border-top-right-radius: 5px;
+border-bottom: 1px solid #666;
+max-height: 50px;
+}
+.dropdown-input .dropdown-input-div{
+width:90%;
+}
+.dropdown-input .dropdown-input-div .input{
+background-color: white;
+width:100%;
+border: none;
+background-image: url('search.png');
+background-position: 10px 10px;
+background-repeat: no-repeat;
+padding: 10px 10px 10px 40px;
+font-size:1rem;
+font-weight:500;
+}
+.dropdown-input .dropdown-input-img{
+background-color: white;
+width:10%;
+padding: 10px 0px 10px 10px;
+}
+
+.dropdown-list{
+padding: 0;
+margin: 0;
+background-color: white;
+width: inherit;
+max-height: 400px;
+overflow: scroll;
+border-bottom-left-radius: 5px;
+border-bottom-right-radius: 5px;
+}
+.dropdown-list-ul{
+border-bottom-left-radius: 5px;
+border-bottom-right-radius: 5px;
+background-color: white;
+list-style: none;
+padding: 0;
+margin: 0; 
+}
+.dropdown-list-li{
+background-color: white;
+padding: 10px 10px 10px 10px;
+}
+.dropdown-list-li:hover{
+background-color: rgb(191, 219, 242);
+}
+.dropdown-list-li:nth-last-child(1){
+border-bottom-left-radius: 5px;
+border-bottom-right-radius: 5px;
+}
+  
