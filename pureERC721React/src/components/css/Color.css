@@ -1,0 +1,27 @@
+.token {
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    transition: transform .2s; /* Animation */
+    display: inline-block;
+  }
+  
+  .token:hover {
+    transform: scale(1.2); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+  }
+
+  
+  /* Tooltip text */
+  .text {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+   
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+  }
